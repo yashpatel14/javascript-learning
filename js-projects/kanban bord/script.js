@@ -41,7 +41,6 @@ function drop(event) {
     task.classList.remove("dragging");
 }
 
-// Modify `addTask` to ensure new tasks get drag events
 function addTask(columnId) {
     const taskText = prompt("Enter task name:");
     if (taskText) {
@@ -49,9 +48,11 @@ function addTask(columnId) {
         task.classList.add("task");
         task.setAttribute("draggable", true);
         task.id = `task-${Math.floor(Math.random() * 1000)}`;
+
         task.innerHTML = `
             <div class="title">
-                ${taskText}
+                <span class="task-text">${taskText}</span> <!-- FIXED: Added class "task-text" -->
+                <button class="edit-task">✎</button>
                 <button class="delete-task" onclick="deleteTask('${task.id}')">×</button>
             </div>
             <div class="details">
@@ -59,17 +60,71 @@ function addTask(columnId) {
                 <span class="avatar"></span>
             </div>
         `;
+
         document.getElementById(columnId).insertBefore(task, document.getElementById(columnId).lastElementChild);
-        
+
+        task.querySelector(".edit-task").addEventListener("click", function () {
+            editTask(task);
+        });
+
         // Add drag events to new task
         task.addEventListener("dragstart", dragStart);
+        let taskIds = task.id
+        saveTaskToLocalStorage(columnId, taskIds, taskText);
     }
 }
+
+function saveTaskToLocalStorage(columnId, taskId, taskText) {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || {};
+    
+    if (!tasks[columnId]) {
+        tasks[columnId] = [];
+    }
+
+    tasks[columnId].push({ id: taskId, text: taskText });
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function updateTaskInLocalStorage(taskId, newText) {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || {};
+    
+    for (let column in tasks) {
+        tasks[column] = tasks[column].map(task =>
+            task.id === taskId ? { ...task, text: newText } : task
+        );
+    }
+
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function removeTaskFromLocalStorage(taskId) {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || {};
+    
+    for (let column in tasks) {
+        tasks[column] = tasks[column].filter(task => task.id !== taskId);
+    }
+
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+
+function editTask(task) {
+    const taskTextElement = task.querySelector(".task-text");
+    if (taskTextElement) {
+        const newText = prompt("Edit task name:", taskTextElement.textContent);
+        if (newText) {
+            taskTextElement.textContent = newText;
+            updateTaskInLocalStorage(task.id, newText);
+        }
+    }
+}
+
 
 function deleteTask(taskId) {
     const task = document.getElementById(taskId);
     if (task) {
         task.remove();
+        removeTaskFromLocalStorage(taskId);
     }
 }
 
