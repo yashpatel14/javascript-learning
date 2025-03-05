@@ -9,20 +9,20 @@ let moves = 0;
 let time = 0;
 let timer;
 
-// Emojis or Images for Cards (Pairs)
+
 const cardValues = ["🐶", "🐶", "🐱", "🐱", "🦊", "🦊", "🐼", "🐼", "🦁", "🦁", "🐰", "🐰", "🐸", "🐸", "🐢", "🐢"];
 
-// Shuffle function
+
 function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
 }
 
-// Create card elements
+
 function createCards() {
-    gameContainer.innerHTML = ""; // Clear previous cards
+    gameContainer.innerHTML = ""; 
     matchedCards = 0;
     flippedCards = [];
-    cards = shuffle([...cardValues]); // Shuffle cards
+    cards = shuffle([...cardValues]); 
 
     cards.forEach((value) => {
         const card = document.createElement("div");
@@ -39,7 +39,7 @@ function createCards() {
     });
 }
 
-// Flip card function
+
 function flipCard() {
     if (flippedCards.length < 2 && !this.classList.contains("flipped")) {
         this.classList.add("flipped");
@@ -51,7 +51,7 @@ function flipCard() {
     }
 }
 
-// Check if two flipped cards match
+
 function checkMatch() {
     moves++;
     movesElement.textContent = moves;
@@ -62,7 +62,7 @@ function checkMatch() {
         matchedCards += 2;
         flippedCards = [];
 
-        // Check if game is won
+
         if (matchedCards === cards.length) {
             clearInterval(timer);
             setTimeout(() => alert(`🎉 You won in ${moves} moves!`), 500);
@@ -76,7 +76,7 @@ function checkMatch() {
     }
 }
 
-// Start Timer
+
 function startTimer() {
     time = 0;
     clearInterval(timer);
@@ -88,7 +88,7 @@ function startTimer() {
     }, 1000);
 }
 
-// Restart Game
+
 function restartGame() {
     moves = 0;
     movesElement.textContent = "0";
@@ -97,5 +97,5 @@ function restartGame() {
     startTimer();
 }
 
-// Initialize Game
+
 restartGame();
